@@ -1,14 +1,16 @@
 import 'package:chat_app/message.dart';
+import 'package:chat_app/theme_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
   final List<Message> _messages = [
     Message(text: 'Hi !.', isUser: true),
@@ -16,8 +18,10 @@ class _MyHomePageState extends State<MyHomePage> {
     Message(text: 'Great and you ', isUser: true),
     Message(text: 'I\'m Excellent', isUser: false),
   ];
+
   @override
   Widget build(BuildContext context) {
+    final currentTheme = ref.read(themeProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -39,9 +43,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            Image.asset(
-              'assets/volume-high.png',
-              color: Colors.blue[800],
+            GestureDetector(
+              onTap: () {
+                ref.read(themeProvider.notifier).toggleTheme();
+              },
+              child: (currentTheme == ThemeMode.dark)
+                  ? Icon(Icons.light_mode)
+                  : Icon(Icons.dark_mode),
             )
           ],
         ),

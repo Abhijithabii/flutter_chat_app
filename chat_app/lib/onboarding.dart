@@ -18,7 +18,7 @@ class Onboarding extends StatelessWidget {
                   Text(
                     'Your AI Assistant',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
                     ),
@@ -29,10 +29,7 @@ class Onboarding extends StatelessWidget {
                   Text(
                     'Using this software, you can ask your questions and recieve articles using artificial intelligence assistant',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black54,
-                    ),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ],
               ),
@@ -48,7 +45,7 @@ class Onboarding extends StatelessWidget {
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
                   (route) => false,
                 );
               },
