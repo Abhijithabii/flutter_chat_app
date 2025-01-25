@@ -210,14 +210,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             color: Colors.grey[300],
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Row(
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 "Typing",
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               AnimatedDots(), // Custom typing animation
             ],
           ),
@@ -229,8 +229,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
 /// Custom animated dots for typing effect
 class AnimatedDots extends StatefulWidget {
+  const AnimatedDots({super.key});
+
   @override
-  _AnimatedDotsState createState() => _AnimatedDotsState();
+  State<AnimatedDots> createState() => _AnimatedDotsState();
 }
 
 class _AnimatedDotsState extends State<AnimatedDots>
