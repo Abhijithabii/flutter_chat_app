@@ -1,31 +1,3 @@
-// import 'package:flutter/material.dart';
-
-// ThemeData lightMode = ThemeData(
-//   brightness: Brightness.light,
-//   colorScheme: const ColorScheme.light(
-//     surface: Color(0xffffffff),
-//     primary: Color(0xff3369FF),
-//     secondary: Color(0xffffffff),
-//   ),
-//   textTheme: const TextTheme(
-//     titleLarge: TextStyle(
-//       color: Color(0xff000000),
-//     ),
-//   ),
-// );
-// ThemeData darkMode = ThemeData(
-//   brightness: Brightness.dark,
-//   colorScheme: const ColorScheme.dark(
-//     surface: Color(0xff000000),
-//     primary: Color(0xff3369FF),
-//     secondary: Color(0xffffffff),
-//   ),
-//   textTheme: const TextTheme(
-//     titleLarge: TextStyle(
-//       color: Color(0xffffffff),
-//     ),
-//   ),
-// );
 import 'package:flutter/material.dart';
 
 class FontSizes {
@@ -47,7 +19,7 @@ ThemeData lightMode = ThemeData(
       primary: Color(0xff3369FF),
       secondary: Color(0xffEEEEEE)),
   inputDecorationTheme:
-      InputDecorationTheme(labelStyle: TextStyle(color: Colors.blue)),
+      const InputDecorationTheme(labelStyle: TextStyle(color: Colors.blue)),
   textTheme: const TextTheme(
       titleLarge: TextStyle(
         color: Color(0xff000000),

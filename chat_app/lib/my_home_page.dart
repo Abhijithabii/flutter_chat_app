@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:chat_app/message.dart';
 import 'package:chat_app/theme_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key});
@@ -12,12 +16,51 @@ class MyHomePage extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
-  final List<Message> _messages = [
-    Message(text: 'Hi !.', isUser: true),
-    Message(text: 'Hello what\'s up ?', isUser: false),
-    Message(text: 'Great and you ', isUser: true),
-    Message(text: 'I\'m Excellent', isUser: false),
-  ];
+  final List<Message> _messages = [];
+  final ScrollController _scrollController = ScrollController();
+  bool _isTyping = false;
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  callGeminiModel() async {
+    try {
+      if (_controller.text.isNotEmpty) {
+        final prompt = _controller.text.trim();
+        // Clear the text field immediately
+        setState(() {
+          _messages.add(Message(text: prompt, isUser: true));
+          _controller.clear();
+          _isTyping = true;
+        });
+        _scrollToBottom();
+
+        final model = GenerativeModel(
+            model: 'gemini-pro', apiKey: dotenv.env['GOOGLE_API_KEY']!);
+
+        final content = [Content.text(prompt)];
+        final response = await model.generateContent(content);
+        setState(() {
+          _isTyping = false;
+          _messages.add(Message(text: response.text!, isUser: false));
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      log('Error - $e');
+      setState(() {
+        _isTyping = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +91,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 ref.read(themeProvider.notifier).toggleTheme();
               },
               child: (currentTheme == ThemeMode.dark)
-                  ? Icon(Icons.light_mode)
-                  : Icon(Icons.dark_mode),
+                  ? const Icon(Icons.light_mode)
+                  : const Icon(Icons.dark_mode),
             )
           ],
         ),
@@ -58,8 +101,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: _messages.length,
+              controller: _scrollController,
+              itemCount: _messages.length + (_isTyping ? 1 : 0),
               itemBuilder: (context, index) {
+                if (index == _messages.length && _isTyping) {
+                  return _buildTypingIndicator();
+                }
                 final message = _messages[index];
                 return ListTile(
                   title: Align(
@@ -111,7 +158,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -128,7 +175,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               .titleSmall!
                               .copyWith(color: Colors.grey),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 20)),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 20)),
                     ),
                   ),
                   const SizedBox(
@@ -137,8 +185,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: GestureDetector(
+                      onTap: callGeminiModel,
                       child: Image.asset('assets/send.png'),
-                      onTap: () {},
                     ),
                   ),
                 ],
@@ -148,5 +196,75 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         ],
       ),
     );
+  }
+
+  /// Widget for typing indicator
+  Widget _buildTypingIndicator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Typing",
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              const SizedBox(width: 6),
+              AnimatedDots(), // Custom typing animation
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom animated dots for typing effect
+class AnimatedDots extends StatefulWidget {
+  @override
+  _AnimatedDotsState createState() => _AnimatedDotsState();
+}
+
+class _AnimatedDotsState extends State<AnimatedDots>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<int> _dotCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(duration: const Duration(seconds: 1), vsync: this)
+          ..repeat();
+    _dotCount = IntTween(begin: 1, end: 3).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.linear),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _dotCount,
+      builder: (context, child) {
+        return Text(
+          '.' * (_dotCount.value + 1),
+          style: const TextStyle(fontSize: 16, color: Colors.black),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

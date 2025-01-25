@@ -15,7 +15,7 @@ class Onboarding extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'Your AI Assistant',
                     style: TextStyle(
                       fontSize: 32,
@@ -23,7 +23,7 @@ class Onboarding extends StatelessWidget {
                       color: Colors.blue,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 16,
                   ),
                   Text(
@@ -45,7 +45,7 @@ class Onboarding extends StatelessWidget {
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                  MaterialPageRoute(builder: (context) => const MyHomePage()),
                   (route) => false,
                 );
               },

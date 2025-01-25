@@ -2,11 +2,14 @@ import 'package:chat_app/onboarding.dart';
 import 'package:chat_app/theme_notifier.dart';
 import 'package:chat_app/themes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
+
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: MyApp(),
     ),
   );
